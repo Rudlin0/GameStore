@@ -36,7 +36,12 @@ List<GameDto> games = [
 app.MapGet("/games", () => games); // Maps GET ".../games" to display all games in the database
 
 // GET /games/1, Maps GET ".../games/{id}" to display a game in the database by its id #
-app.MapGet("/games/{id}", (int id) => games.Find(game => game.Id == id)) // Expects int id to match "/games/{id}"
+app.MapGet("/games/{id}", (int id) => 
+{
+    var game = games.Find(game => game.Id == id);
+
+    return game is null ? Results.NotFound() : Results.Ok(game);
+})
     .WithName(GetGameEndpointName); //Assigns unique identifier to this request for use in other requests
 
 // POST /games
@@ -52,13 +57,18 @@ app.MapPost("/games", (CreateGameDto newGame) =>
 
     games.Add(game);
 
-    return Results.CreatedAtRoute(GetGameEndpointName, new {id = game.Id}, game);
-}); // Maps POST ".../games" to add a game to the database as a GameDto object, then returns a 201 Created response containing the details of the added game. Expects CreateGameDto object to add the game with
+    return Results.CreatedAtRoute(GetGameEndpointName, new {id = game.Id}, game); // Returns a 201 Created response containing the details of the added game, and includes a Location header with the URI of the newly created game resource
+}); // Maps POST ".../games" to add a game to the database as a GameDto object, expects CreateGameDto object to add the game with
 
 // PUT /games/1
 app.MapPut("/games/{id}", (int id, UpdateGameDto updatedGame) =>
 {
-    var index = games.FindIndex(game => game.Id == id);
+    var index = games.FindIndex(game => game.Id == id); // Finds the index of the game with the specified id in the database
+
+    if (index == -1)
+    {
+        return Results.NotFound();
+    } // Returns a 404 Not Found response if the game with the specified id is not found in the database
 
     games[index] = new GameDto(
         id,
@@ -66,9 +76,17 @@ app.MapPut("/games/{id}", (int id, UpdateGameDto updatedGame) =>
         updatedGame.Genre,
         updatedGame.Price,
         updatedGame.ReleaseDate
-    ); // Not threat-safe. But for the sake of this example, we will assume that the game exists and that the index is valid.
+    ); // Updates the game with the specified id in the database with the new values from the UpdateGameDto object. Not threat-safe.
 
     return Results.NoContent();
 }); // Maps PUT ".../games/{id}" to update a game in the database by its id #, expects int id to match "/games/{id}" and UpdateGameDto object to update the game with
 
-app.Run();
+// DELETE /games/1
+app.MapDelete("/games/{id}", (int id) =>
+{
+    games.RemoveAll(game => game.Id == id); // Removes the game with the specified id from the database
+
+    return Results.NoContent(); // Returns a 204 No Content response whether or not the game with the specified id was found and removed from the database
+}); // Maps DELETE ".../games/{id}" to delete a game in the database by its id #, expects int id to match "/games/{id}"
+
+app.Run(); // Starts the application and begins listening for incoming HTTP requests
