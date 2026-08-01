@@ -53,6 +53,22 @@ app.MapPost("/games", (CreateGameDto newGame) =>
     games.Add(game);
 
     return Results.CreatedAtRoute(GetGameEndpointName, new {id = game.Id}, game);
-}); // Maps POST ".../games" to add a game to the database as a GameDto object, then returns a 201 Created response containing the details of the added game.
+}); // Maps POST ".../games" to add a game to the database as a GameDto object, then returns a 201 Created response containing the details of the added game. Expects CreateGameDto object to add the game with
+
+// PUT /games/1
+app.MapPut("/games/{id}", (int id, UpdateGameDto updatedGame) =>
+{
+    var index = games.FindIndex(game => game.Id == id);
+
+    games[index] = new GameDto(
+        id,
+        updatedGame.Name,
+        updatedGame.Genre,
+        updatedGame.Price,
+        updatedGame.ReleaseDate
+    ); // Not threat-safe. But for the sake of this example, we will assume that the game exists and that the index is valid.
+
+    return Results.NoContent();
+}); // Maps PUT ".../games/{id}" to update a game in the database by its id #, expects int id to match "/games/{id}" and UpdateGameDto object to update the game with
 
 app.Run();
