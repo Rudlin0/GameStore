@@ -1,92 +1,17 @@
-//File created by Rudy Liljeberg, August 1st, 2026
+// File created by Rudy Liljeberg, August 1st, 2026
 
-using GameStore.Api.Dtos;
+using GameStore.Api.Data;
+using GameStore.Api.Endpoints;
 
-const string GetGameEndpointName = "GetGame"; //Creates constant for identifying games by their name
+var builder = WebApplication.CreateBuilder(args); // Creates a new instance of the WebApplicationBuilder class, which is used to configure and build the web application
 
-/** Configures service applications **/
-var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddValidation(); // Adds validation services to builder
 
-var app = builder.Build();
+var connString = "Data Source=GameStore.db"; // Connection string for accessing the database (GameStore.db, in this case)
+builder.Services.AddSqlite<GameStoreContext>(connString); // Adds GameStoreContext (instance of DbContext) as a service (essentially the interface layer) between our application and the database
 
-/** Configures HTTP request pipeline (Defines what happens when HTTP requests start arriving into application) **/
+var app = builder.Build(); // Builds the application and prepares it to handle incoming HTTP requests
 
-List<GameDto> games = [
-    new (
-        1,
-        "Street Fighter II",
-        "Fighting",
-        19.99M,
-        new DateOnly(1992, 7, 15)),
-    new (
-        2,
-        "Final Fantasy VII Rebirth",
-        "RPG",
-        69.99M,
-        new DateOnly(2024, 2, 29)),
-    new (
-        3,
-        "Astro Bot",
-        "Platformer",
-        59.99M,
-        new DateOnly(2024, 9, 6))
-];
-
-// GET /games
-app.MapGet("/games", () => games); // Maps GET ".../games" to display all games in the database
-
-// GET /games/1, Maps GET ".../games/{id}" to display a game in the database by its id #
-app.MapGet("/games/{id}", (int id) => 
-{
-    var game = games.Find(game => game.Id == id);
-
-    return game is null ? Results.NotFound() : Results.Ok(game);
-})
-    .WithName(GetGameEndpointName); //Assigns unique identifier to this request for use in other requests
-
-// POST /games
-app.MapPost("/games", (CreateGameDto newGame) =>
-{
-    GameDto game = new(
-        games.Count + 1,
-        newGame.Name,
-        newGame.Genre,
-        newGame.Price,
-        newGame.ReleaseDate
-    ); // 
-
-    games.Add(game);
-
-    return Results.CreatedAtRoute(GetGameEndpointName, new {id = game.Id}, game); // Returns a 201 Created response containing the details of the added game, and includes a Location header with the URI of the newly created game resource
-}); // Maps POST ".../games" to add a game to the database as a GameDto object, expects CreateGameDto object to add the game with
-
-// PUT /games/1
-app.MapPut("/games/{id}", (int id, UpdateGameDto updatedGame) =>
-{
-    var index = games.FindIndex(game => game.Id == id); // Finds the index of the game with the specified id in the database
-
-    if (index == -1)
-    {
-        return Results.NotFound();
-    } // Returns a 404 Not Found response if the game with the specified id is not found in the database
-
-    games[index] = new GameDto(
-        id,
-        updatedGame.Name,
-        updatedGame.Genre,
-        updatedGame.Price,
-        updatedGame.ReleaseDate
-    ); // Updates the game with the specified id in the database with the new values from the UpdateGameDto object. Not threat-safe.
-
-    return Results.NoContent();
-}); // Maps PUT ".../games/{id}" to update a game in the database by its id #, expects int id to match "/games/{id}" and UpdateGameDto object to update the game with
-
-// DELETE /games/1
-app.MapDelete("/games/{id}", (int id) =>
-{
-    games.RemoveAll(game => game.Id == id); // Removes the game with the specified id from the database
-
-    return Results.NoContent(); // Returns a 204 No Content response whether or not the game with the specified id was found and removed from the database
-}); // Maps DELETE ".../games/{id}" to delete a game in the database by its id #, expects int id to match "/games/{id}"
+app.MapGamesEndpoint(); // Configures the HTTP request pipeline to handle requests related to the games database
 
 app.Run(); // Starts the application and begins listening for incoming HTTP requests
