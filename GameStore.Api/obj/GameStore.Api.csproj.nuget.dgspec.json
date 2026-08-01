@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\projects\\GameStore\\gamestore.api\\GameStore.Api.csproj": {}
+    "C:\\projects\\GameStore\\GameStore.Api\\GameStore.Api.csproj": {}
   },
   "projects": {
-    "C:\\projects\\GameStore\\gamestore.api\\GameStore.Api.csproj": {
+    "C:\\projects\\GameStore\\GameStore.Api\\GameStore.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\projects\\GameStore\\gamestore.api\\GameStore.Api.csproj",
+        "projectUniqueName": "C:\\projects\\GameStore\\GameStore.Api\\GameStore.Api.csproj",
         "projectName": "GameStore.Api",
-        "projectPath": "C:\\projects\\GameStore\\gamestore.api\\GameStore.Api.csproj",
+        "projectPath": "C:\\projects\\GameStore\\GameStore.Api\\GameStore.Api.csproj",
         "packagesPath": "C:\\Users\\rudyl\\.nuget\\packages\\",
-        "outputPath": "C:\\projects\\GameStore\\gamestore.api\\obj\\",
+        "outputPath": "C:\\projects\\GameStore\\GameStore.Api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
