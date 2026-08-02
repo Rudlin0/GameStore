@@ -2,11 +2,12 @@
 
 namespace GameStore.Api.Models;
 
+/** Model for the Game object type, including Id, Name, Genre, GenreId, Price, and ReleaseDate attributes **/
 public class Game
 {
     public int Id { get; set; }
 
-    public required string Name { get; set; } // Compiler will force Name to be defined whenever called
+    public required string Name { get; set; } // Compiler will force Name to be defined whenever this method is called
 
     public Genre? Genre { get; set; } // Nullable constructor for object of type Genre
 

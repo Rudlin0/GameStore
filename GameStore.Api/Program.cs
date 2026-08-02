@@ -14,4 +14,6 @@ var app = builder.Build(); // Builds the application and prepares it to handle i
 
 app.MapGamesEndpoint(); // Configures the HTTP request pipeline to handle requests related to the games database
 
+app.MigrateDb(); // Executes migrations so that application and database data models match before starting application proper
+
 app.Run(); // Starts the application and begins listening for incoming HTTP requests
