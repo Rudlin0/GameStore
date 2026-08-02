@@ -4,7 +4,9 @@ using System;
 
 namespace GameStore.Api.Endpoints;
 
+using GameStore.Api.Data;
 using GameStore.Api.Dtos;
+using GameStore.Api.Models;
 
 public static class GamesEndpoints
 {
@@ -50,20 +52,31 @@ public static class GamesEndpoints
             .WithName(GetGameEndpointName); // Assigns unique identifier to this request for use in other requests
 
         // POST /games
-        group.MapPost("/", (CreateGameDto newGame) =>
+        group.MapPost("/", (CreateGameDto newGame, GameStoreContext dbContext) =>
         {
-            GameDto game = new(
-                games.Count + 1,
-                newGame.Name,
-                newGame.Genre,
-                newGame.Price,
-                newGame.ReleaseDate
-            ); // Creates a new GameDto object with details provided from newGame, and assigns it a new id based on the current number of games in the database + 1
+            Game game = new()
+            {
+                Name = newGame.Name,
+                GenreId = newGame.GenreId,
+                Price = newGame.Price,
+                ReleaseDate = newGame.ReleaseDate
+            }; // Defines game model to insert into the database
 
-            games.Add(game); // Adds the newly created GameDto object to the database
+            dbContext.Games.Add(game); // Asks EntityFrameworkCore to begin tracking that a new game needs to be inserted into the database
+            dbContext.SaveChanges(); // Translates any pending changes in the DbContext change tracker into SQL statements that the database can understand
 
-            return Results.CreatedAtRoute(GetGameEndpointName, new { id = game.Id }, game); // Returns a 201 Created response containing the details of the added game, and includes a Location header with the URI of the newly created game resource
-        }); // Maps "POST .../games" to add a game to the database as a GameDto object, expects CreateGameDto object to add the game with
+            GameDetailsDto gameDto = new(
+                game.Id,
+                game.Name,
+                game.GenreId,
+                game.Price,
+                game.ReleaseDate
+            );
+
+            return Results.CreatedAtRoute(GetGameEndpointName, new { id = gameDto.Id }, gameDto); // Returns a 201 Created response containing the details of the added game, and includes a Location header with the URI of the newly created game resource
+        }); // Maps "POST .../games" to add a game to the database as an instance of the model Game object, 
+            // expects CreateGameDto object to define the new game model to insert into the database,
+            // as well as an instance of GameStoreContext in order to store game into the database using said context
 
         // PUT /games/1
         group.MapPut("/{id}", (int id, UpdateGameDto updatedGame) =>
