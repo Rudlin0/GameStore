@@ -19,7 +19,7 @@ public static class GamesEndpoints
     {
         var group = app.MapGroup("/games"); // Creates a group of endpoints for handling requests related to games, with the base URL "/games"
 
-        // GET /games, Maps "GET .../games" to asynchronously display all games currently in the database
+        // GET /games
         group.MapGet("/", async (GameStoreContext dbContext) 
             => await dbContext.Games
                               .Include(game => game.Genre) // Ensures that the game's Genre will be included in this selection                            
@@ -31,9 +31,10 @@ public static class GamesEndpoints
                                 game.ReleaseDate
                               )) // Projects each game in our Games table in the database as a new GameSummaryDto object
                               .AsNoTracking() // Tells EF Core not to track any changes from the selection process
-                              .ToListAsync()); // Asynchronously creates a list of type GameSummaryDto out of the projected game objects
+                              .ToListAsync() // Asynchronously creates a list of type GameSummaryDto out of the projected Game objects
+                ); // Maps "GET .../games" to asynchronously display all games currently in the database
 
-        // GET /games/1, Maps "GET .../games/{id}" to asynchronously display a game in the database by its id #
+        // GET /games/1
         group.MapGet("/{id}", async (int id, GameStoreContext dbContext) =>
         {
             var game = await dbContext.Games.FindAsync(id); // Asynchronously finds the game with the specified id in the database
@@ -47,7 +48,7 @@ public static class GamesEndpoints
                     game.ReleaseDate
                 ) // Returns a 404 Not Found response if the game with the specified id is not found in the database, otherwise returns a 200 OK response with details of the specified game as a new GameDetailsDto object
             );
-        })
+        }) // Maps "GET .../games/{id}" to asynchronously display a game in the database by its id #
             .WithName(GetGameEndpointName); // Assigns unique identifier to this request for use in other requests
 
         // POST /games
