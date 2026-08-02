@@ -1,0 +1,1 @@
+This is a project meant to help me practice developing a back-end API with ASP.NET and C#. I followed along with this video (link: https://www.youtube.com/watch?v=YbRe4iIVYJk) to make this project. I added additional comments to help clarify what is going on in the code at any given time, as well as to better understand the overall structure of the project as a whole. Thank you.
