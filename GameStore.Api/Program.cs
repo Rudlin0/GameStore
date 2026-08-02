@@ -6,9 +6,7 @@ using GameStore.Api.Endpoints;
 var builder = WebApplication.CreateBuilder(args); // Creates a new instance of the WebApplicationBuilder class, which is used to configure and build the web application
 
 builder.Services.AddValidation(); // Adds validation services to builder
-
-var connString = "Data Source=GameStore.db"; // Connection string for accessing the database (GameStore.db, in this case)
-builder.Services.AddSqlite<GameStoreContext>(connString); // Adds GameStoreContext (instance of DbContext) as a service (essentially the interface layer) between our application and the database
+builder.AddGameStoreDb(); // Establishes GameStore.db as this application's database
 
 var app = builder.Build(); // Builds the application and prepares it to handle incoming HTTP requests
 
