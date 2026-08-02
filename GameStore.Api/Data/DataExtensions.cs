@@ -21,7 +21,7 @@ public static class DataExtensions
         as well as seeding the Genres table within said database **/
     public static void AddGameStoreDb(this WebApplicationBuilder builder)
     {
-        var connString = "Data Source=GameStore.db"; // Connection string for accessing the database (GameStore.db, in this case)
+        var connString =  builder.Configuration.GetConnectionString("GameStore"); // Establishes connection string for accessing the database (GameStore.db, in this case)
         builder.Services.AddSqlite<GameStoreContext>(
             connString,
             optionsAction: options => options.UseSeeding((context, _) => // NOTE: UseSeeding() takes in two parameters, the second of which we discard using an underscore here
